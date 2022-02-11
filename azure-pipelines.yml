@@ -59,3 +59,22 @@ stages:
     - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       displayName: 'Upload package'
       artifact: drop
+
+- stage: Deploy
+  displayName: Deployment su staging
+  jobs:
+  - job: Deployjob
+    steps:
+      - 
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'gdardia-airs-subscription (e50784e7-b1b9-47a4-b098-654662e73f01)'
+        appType: 'webAppLinux'
+        WebAppName: 'python-flask-webapp'
+        deployToSlotOrASE: true
+        ResourceGroupName: 'devops'
+        SlotName: 'staging'
+        packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+        RuntimeStack: 'PYTHON|3.7'
+        StartupCommand: 'gunicorn --bind=0.0.0.0 --workers=4 startup:app'
